@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Weekly</string>
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="title_activity_menubar">MenubarActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_password_recovery">PasswordRecoveryActivity</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_weekly_plan_setup">WeeklyPlanSetup</string>
+    <string name="title_activity_loading">LoadingActivity</string>
+    <string name="title_activity_error">ErrorActivity</string>
+    <string name="title_activity_email_confirmation">EmailConfirmationActivity</string>
+</resources>
