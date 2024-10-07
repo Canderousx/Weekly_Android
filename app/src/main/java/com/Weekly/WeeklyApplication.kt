@@ -9,7 +9,6 @@ import com.Weekly.android.viewModel.EmailConfirmationModel
 import com.Weekly.android.viewModel.HomeViewModel
 import com.Weekly.android.viewModel.SignInViewModel
 import com.Weekly.android.viewModel.SignUpViewModel
-import com.Weekly.android.viewModel.WeeklyPlanSetupModel
 import com.Weekly.android.viewModel.WelcomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -33,7 +32,6 @@ class WeeklyApplication : Application() {
                     viewModel { HomeViewModel(get()) }
                     viewModel { SignInViewModel(get(),get()) }
                     viewModel { SignUpViewModel(get())}
-                    viewModel { WeeklyPlanSetupModel(get()) }
                     viewModel { EmailConfirmationModel(get(),get()) }
                 }
             )

@@ -5,6 +5,7 @@ import com.Weekly.android.model.Response.EmailExistsResponse
 import com.Weekly.android.model.Response.ServerResponse
 import com.Weekly.android.model.Request.SignupRequest
 import com.Weekly.android.model.Request.UsernameExistsRequest
+import com.Weekly.android.model.Request.WeeklyPlanSetupReq
 import com.Weekly.android.model.User
 import com.Weekly.android.model.Response.UsernameExistsResponse
 import com.Weekly.android.service.LogService
@@ -65,5 +66,19 @@ class UserDetailsApi(apiConfiguration: ApiConfiguration) {
         }
         val serverResponse: ServerResponse = response.body()
         return serverResponse
+    }
+
+    suspend fun setWeeklyPlan(weeklyPlan: Double,currency: String,editMode:Boolean): ServerResponse?{
+        val url = if(editMode) "editWeeklyPlan" else "setWeeklyPlan"
+        val weeklyPlanRequest = WeeklyPlanSetupReq(weeklyPlan,currency)
+        val response =  httpClient.post(serverUrl+url){
+            setBody(weeklyPlanRequest)
+            contentType(contentType)
+        }
+        if(response.status.value == 200){
+            val serverResponse: ServerResponse = response.body()
+            return serverResponse
+        }
+        return null
     }
 }

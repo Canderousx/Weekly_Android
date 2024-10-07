@@ -11,6 +11,7 @@ import com.Weekly.android.model.CurrentHomeTab
 import com.Weekly.android.model.Expense
 import com.Weekly.android.model.ExpensesList
 import com.Weekly.android.model.Request.NewExpenseRequest
+import com.Weekly.android.model.Request.WeeklyPlanSetupReq
 import com.Weekly.android.model.Response.ServerResponse
 import com.Weekly.android.model.ServerOperationStatus
 
@@ -44,6 +45,25 @@ class HomeViewModel(
         initData()
     }
 
+    fun weeklyPlanSetup(weeklyPlan: String,currency: String,editMode: Boolean){
+        operationStatus = ServerOperationStatus.UNKNOWN
+        serverResponse = null
+        if(weeklyPlan == "" || weeklyPlan.toDouble() == (currentUser?.weeklyPlan ?: 0.0) || (!editMode && currency == "")){
+            operationStatus = ServerOperationStatus.ERROR
+            serverResponse = ServerResponse("Invalid values")
+            return
+        }
+        serverConnection(
+            method = { userDetailsApi.setWeeklyPlan(weeklyPlan.toDouble(),currency,editMode)},
+            onSuccess = {
+                getCurrentUser()
+                changeTab(CurrentHomeTab.CURRENT_WEEK)
+            }
+        )
+
+
+    }
+
     fun changeTab(tab: CurrentHomeTab){
         serverResponse = null
         operationStatus = ServerOperationStatus.UNKNOWN
@@ -72,11 +92,15 @@ class HomeViewModel(
         changeTab(CurrentHomeTab.CURRENT_WEEK)
     }
 
-    private fun initData(){
+    private fun getCurrentUser(){
         serverConnection(
             method = { userDetailsApi.getCurrentUser() },
             onSuccess = { user -> currentUser = user },
         )
+    }
+
+    private fun initData(){
+        getCurrentUser()
         serverConnection(
             method = { weekApi.getCurrentWeek() },
             onSuccess = {

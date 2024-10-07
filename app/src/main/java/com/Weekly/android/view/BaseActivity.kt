@@ -43,7 +43,7 @@ abstract class BaseActivity<T: BaseViewModel>: ComponentActivity() {
     @Composable
     open fun OnSuccess(){
         Toast.makeText(this,"Operation Success!",Toast.LENGTH_LONG).show()
-        logger.error("OnSuccess method hasn't been overridden!")
+        logger.error("OnSuccess method is not overridden!")
     }
 
     @Composable

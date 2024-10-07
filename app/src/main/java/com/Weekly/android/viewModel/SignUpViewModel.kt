@@ -22,7 +22,7 @@ class SignUpViewModel(private val apiConfiguration: ApiConfiguration, ): BaseVie
 
     var emailExists by mutableStateOf(false)
 
-    var signupSend by mutableStateOf(false)
+    var signupSuccess by mutableStateOf(false)
 
 
     fun getSignupRequest(): SignupRequest{
@@ -44,41 +44,40 @@ class SignUpViewModel(private val apiConfiguration: ApiConfiguration, ): BaseVie
         )
     }
 
-    private fun validateForm():Boolean{
-        if(!ValidatorService.SignupValidator.isNotEmpty(getSignupRequest())){
-            operationStatus = ServerOperationStatus.ERROR
-            serverResponse = ServerResponse("Every field is required")
-            logger.info("Missing fields detected")
-            return false
-        }
-        if(!ValidatorService.EmailValidator.isValid(email)){
-            operationStatus = ServerOperationStatus.ERROR
-            serverResponse = ServerResponse("Invalid email address")
-            logger.info("Wrong email address detected")
-            return false
-        }
-        checkUsername()
+    fun checkExists(){
         checkEmail()
-        return (usernameExists && emailExists)
+        checkUsername()
+    }
+
+    private fun validateForm(): Boolean {
+            if (!ValidatorService.SignupValidator.isNotEmpty(getSignupRequest())) {
+                serverResponse = ServerResponse("Every field is required")
+                logger.info("Missing fields detected")
+                return false
+            }
+            if (!ValidatorService.EmailValidator.isValid(email)) {
+                serverResponse = ServerResponse("Invalid email address")
+                logger.info("Wrong email address detected")
+                return false
+            }
+            return true
     }
 
     fun signup(){
+        signupSuccess = false
         operationStatus = ServerOperationStatus.UNKNOWN
         serverResponse = null
         if(!validateForm()){
+            operationStatus = ServerOperationStatus.ERROR
             logger.info("Signup form is invalid!. HTTP Request aborted")
             return
         }
-        signupSend = true
         serverConnection(
             method = {userDetailsApi.signup(getSignupRequest())},
-            onSuccess = {message -> serverResponse = message},
-        )
+            onSuccess = {
+                message -> serverResponse = message
+                signupSuccess = true})
+        }
+
 
     }
-
-
-
-
-
-}

@@ -1,6 +1,8 @@
 package com.Weekly.android.view
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.Weekly.android.R
+import com.Weekly.android.model.ServerOperationStatus
 import com.Weekly.android.service.LogService
 import com.Weekly.android.service.NotificationService
 import com.Weekly.android.viewModel.SignUpViewModel
@@ -46,6 +49,27 @@ class SignUpActivity : BaseActivity<SignUpViewModel>() {
     private val logger = LogService();
     private val notifications = NotificationService(this)
 
+    @Composable
+    override fun OnSuccess() {
+        logger.info("ON SUCCESS")
+        if(viewModel.signupSuccess){
+            Toast.makeText(this, viewModel.serverResponse?.message ?: "",Toast.LENGTH_LONG).show()
+            val intent = Intent(this,WelcomeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    @Composable
+    override fun OnLoading() {
+    }
+
+    @Composable
+    override fun OnServerError() {
+        Toast.makeText(this,viewModel.serverResponse?.message?:"",Toast.LENGTH_LONG).show()
+        viewModel.checkExists()
+    }
 
     @Composable
     fun SignUpWindow(){

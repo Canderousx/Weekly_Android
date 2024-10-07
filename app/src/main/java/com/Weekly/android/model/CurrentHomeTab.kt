@@ -6,4 +6,5 @@ enum class CurrentHomeTab {
     STATISTICS,
     EDIT_EXPENSE,
     CONFIRMATION_PANEL,
+    EDIT_WEEKLY_PLAN,
 }

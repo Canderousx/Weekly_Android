@@ -60,22 +60,29 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MenuBar(viewModel.currentTab, changeTab = {tab -> viewModel.changeTab(tab)}){
-                Background {
-                    when(viewModel.currentTab){
-                        CurrentHomeTab.CURRENT_WEEK -> HomeWindow()
-                        CurrentHomeTab.NEW_EXPENSE -> NewExpenseWindow { viewModel.returnToCurrentWeek() }
-                        CurrentHomeTab.STATISTICS -> StatisticsWindow { viewModel.returnToCurrentWeek() }
-                        CurrentHomeTab.EDIT_EXPENSE -> EditExpense { viewModel.returnToCurrentWeek() }
-                        CurrentHomeTab.CONFIRMATION_PANEL -> ConfirmationPanel(
-                            onBackPressed = {viewModel.returnToCurrentWeek()},
-                            onAgree = {viewModel.confirmationOnAgree()},
-                            onDisagree = {viewModel.confirmationOnDisagree()},
-                            text = viewModel.confirmationMessage
-                        )
+            if (viewModel.currentUser != null && viewModel.currentWeek != null) {
+                if(viewModel.currentUser!!.weeklyPlan == 0.0){
+                    WeeklyPlanSetup(false)
+                }else{
+                    MenuBar(viewModel.currentTab, changeTab = {tab -> viewModel.changeTab(tab)}){
+                        Background {
+                            when(viewModel.currentTab){
+                                CurrentHomeTab.CURRENT_WEEK -> HomeWindow()
+                                CurrentHomeTab.NEW_EXPENSE -> NewExpenseWindow { viewModel.returnToCurrentWeek() }
+                                CurrentHomeTab.STATISTICS -> StatisticsWindow { viewModel.returnToCurrentWeek() }
+                                CurrentHomeTab.EDIT_EXPENSE -> EditExpense { viewModel.returnToCurrentWeek() }
+                                CurrentHomeTab.CONFIRMATION_PANEL -> ConfirmationPanel(
+                                    onBackPressed = {viewModel.returnToCurrentWeek()},
+                                    onAgree = {viewModel.confirmationOnAgree()},
+                                    onDisagree = {viewModel.confirmationOnDisagree()},
+                                    text = viewModel.confirmationMessage
+                                )
 
-
+                                CurrentHomeTab.EDIT_WEEKLY_PLAN -> WeeklyPlanSetup(true)
+                            }
+                        }
                     }
+
                 }
             }
             ObserveServerStatus()
@@ -126,6 +133,82 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
 
         }
 
+
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun WeeklyPlanSetup(editMode: Boolean){
+            var weeklyPlan by rememberSaveable { mutableStateOf( if(editMode) viewModel.currentUser?.weeklyPlan.toString() else "") }
+            var selectedCurrency by rememberSaveable { mutableStateOf(if(editMode) viewModel.currentUser?.currency else viewModel.availableCurrencies?.names?.get(0) ?:"")}
+            var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally){
+                Text(if(editMode) "Edit your weekly expense goal" else "First, you need to specify your weekly expense goal!")
+                Spacer(Modifier.size(25.dp))
+                TextField(
+                    value = weeklyPlan,
+                    onValueChange = {weeklyPlan = it},
+                    label = { Text(text = "Your weekly expense goal") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                Spacer(Modifier.size(15.dp))
+
+                if(!editMode){
+
+                    ExposedDropdownMenuBox(
+                        expanded = dropDownExpanded,
+                        onExpandedChange = {dropDownExpanded = !dropDownExpanded}
+
+                    ) {
+                        selectedCurrency?.let {
+                            TextField(
+                                value = it,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Currency") },
+                                trailingIcon = {ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded)},
+                                modifier = Modifier
+                                    .fillMaxWidth().menuAnchor()
+                            )
+                        }
+                        ExposedDropdownMenu(
+                            expanded = dropDownExpanded,
+                            onDismissRequest = {dropDownExpanded = false},
+                        ) {
+                            viewModel.availableCurrencies?.names?.forEachIndexed{ index, currency ->
+                                DropdownMenuItem(
+                                    text = { Text(text = currency) },
+                                    onClick = {selectedCurrency = viewModel.availableCurrencies?.names!![index]
+                                        dropDownExpanded = false}
+                                )
+                            }
+                        }
+                    }
+
+                }
+
+
+                Spacer(Modifier.size(15.dp))
+                Button(colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.White,
+                    containerColor = Color(0xFF0A3F04)),
+                    onClick = {
+                        selectedCurrency?.let {
+                            viewModel.weeklyPlanSetup(
+                                weeklyPlan = weeklyPlan,
+                                currency = it,
+                                editMode = editMode
+                            )
+                        }
+                    }) {
+
+                    Text(text= if(editMode) "Edit" else "Confirm")
+
+                }
+            }
 
     }
 
@@ -202,7 +285,9 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                 Text("/${currentUser.weeklyPlan}", style = TextStyle(fontSize = 35.sp))
                 Text(currentUser.currency, style = TextStyle(fontSize = 35.sp))
                 Spacer(modifier = Modifier.size(10.dp))
-                Button(onClick = {},
+                Button(onClick = {
+                    viewModel.changeTab(CurrentHomeTab.EDIT_WEEKLY_PLAN)
+                },
                     shape = CircleShape,
                     modifier = Modifier.size(30.dp),
                     contentPadding = PaddingValues(1.dp)
@@ -224,6 +309,9 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                 .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if((viewModel.currentExpenses?.expenses?.size ?: 0) == 0){
+                Text("No expenses yet")
+            }
 
             LazyColumn {
                 items(viewModel.currentExpenses?.expenses ?: emptyList()) { expense ->
@@ -310,20 +398,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     fun HomeWindow(){
         viewModel.logger.info("CURRENT USER: ${viewModel.currentUser?.username}")
         viewModel.logger.info("CURRENT WEEK: ${viewModel.currentWeek?.expenses}")
-
-        if (viewModel.currentUser != null) {
-            if(viewModel.currentUser!!.weeklyPlan == 0.0){
-                val intent = Intent(LocalContext.current,WeeklyPlanSetup::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                intent.putExtra("currentUser",viewModel.currentUser)
-                startActivity(intent)
-                finish()
-            }
-            if(viewModel.currentWeek != null){
-                CurrentWeek(viewModel.currentUser!!, viewModel.currentWeek!!)
-            }
-
-        }
+        CurrentWeek(viewModel.currentUser!!, viewModel.currentWeek!!)
     }
 
     @Composable
