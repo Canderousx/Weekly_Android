@@ -99,7 +99,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
 
     }
 
-    fun getExpenseColor(expenses: Double, weeklyPlan: Double): Color{
+    private fun getExpenseColor(expenses: Double, weeklyPlan: Double): Color{
         if (expenses > weeklyPlan ){
             return Color.Red
         }
