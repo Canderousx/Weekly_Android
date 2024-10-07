@@ -62,7 +62,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         setContent {
             if (viewModel.currentUser != null && viewModel.currentWeek != null) {
                 if(viewModel.currentUser!!.weeklyPlan == 0.0){
-                    WeeklyPlanSetup(false)
+                    WeeklyPlanSetup(false) { viewModel.returnToCurrentWeek() }
                 }else{
                     MenuBar(viewModel.currentTab, changeTab = {tab -> viewModel.changeTab(tab)}){
                         Background {
@@ -78,7 +78,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                                     text = viewModel.confirmationMessage
                                 )
 
-                                CurrentHomeTab.EDIT_WEEKLY_PLAN -> WeeklyPlanSetup(true)
+                                CurrentHomeTab.EDIT_WEEKLY_PLAN -> WeeklyPlanSetup(true){ viewModel.returnToCurrentWeek() }
                             }
                         }
                     }
@@ -138,7 +138,12 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun WeeklyPlanSetup(editMode: Boolean){
+    fun WeeklyPlanSetup(editMode: Boolean, onBackPressed: () -> Unit){
+            BackHandler {
+                if(editMode){
+                    onBackPressed()
+                }
+            }
             var weeklyPlan by rememberSaveable { mutableStateOf( if(editMode) viewModel.currentUser?.weeklyPlan.toString() else "") }
             var selectedCurrency by rememberSaveable { mutableStateOf(if(editMode) viewModel.currentUser?.currency else viewModel.availableCurrencies?.names?.get(0) ?:"")}
             var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
