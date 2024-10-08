@@ -43,6 +43,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.substring
@@ -53,6 +56,7 @@ import com.Weekly.android.model.CurrentHomeTab
 import com.Weekly.android.model.Expense
 import com.Weekly.android.model.User
 import com.Weekly.android.model.Week
+import com.Weekly.android.service.FontService
 import com.Weekly.android.service.TextFormatter
 import com.Weekly.android.viewModel.HomeViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -282,7 +286,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                 .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Week", style = TextStyle(fontSize = 25.sp))
+            Text("Week", style = TextStyle(fontSize = 25.sp, fontFamily = FontService.montserrat))
             Text(
                 "${currentWeek.getStartDate()} - ${currentWeek.getEndDate()}",
                 style = TextStyle(fontSize = 25.sp)

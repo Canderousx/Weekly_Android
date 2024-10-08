@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.koin.android)
     implementation(libs.ktor.client.android)
+    implementation(libs.androidx.ui.text.google.fonts)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
