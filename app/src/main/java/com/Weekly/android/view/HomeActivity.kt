@@ -104,9 +104,9 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
 
     private fun getExpenseColor(expenses: Double, weeklyPlan: Double): Color{
         if (expenses > weeklyPlan ){
-            return Color.Red
+            return Color(0xFF720000)
         }
-        return Color.Green
+        return Color(0xFF0B5B00)
 
     }
 
@@ -304,7 +304,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                     viewModel.changeTab(CurrentHomeTab.EDIT_WEEKLY_PLAN)
                 },
                     shape = CircleShape,
-                    modifier = Modifier.size(30.dp),
+                    modifier = Modifier.size(25.dp),
                     contentPadding = PaddingValues(1.dp)
                 ){
                     Icon(
