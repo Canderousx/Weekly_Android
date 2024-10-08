@@ -1,12 +1,12 @@
 package com.Weekly.android.view
 import MenuBar
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.Weekly.android.R
@@ -52,6 +53,7 @@ import com.Weekly.android.model.CurrentHomeTab
 import com.Weekly.android.model.Expense
 import com.Weekly.android.model.User
 import com.Weekly.android.model.Week
+import com.Weekly.android.service.TextFormatter
 import com.Weekly.android.viewModel.HomeViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -89,6 +91,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         }
     }
 
+
     @Composable
     override fun OnServerError() {
         super.OnServerError()
@@ -108,32 +111,39 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     }
 
     @Composable
-    fun Background(content: @Composable () -> Unit){
-        Column(modifier = Modifier
-            .background(Color.LightGray)
-            .fillMaxSize()
-            .padding(top = 20.dp, start = 15.dp, end = 15.dp, bottom = 15.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Image(
-                painter = painterResource(id = R.drawable.weekly_black_logo),
-                contentDescription = "White logo",
-                modifier = Modifier.size(120.dp),
-                contentScale = ContentScale.Fit
-            )
+    fun Background(content: @Composable () -> Unit) {
+        Box(
+            modifier = Modifier
+                .background(Color.LightGray)
+                .fillMaxSize()
+                .padding(top = 20.dp, start = 15.dp, end = 15.dp, bottom = 20.dp)
+        ) {
             Column(
-                modifier = Modifier.background(Color(0xFFBDBDBD))
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 15.dp, bottom = 15.dp, start = 15.dp, end = 15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 content()
             }
 
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.weekly_black_logo),
+                    contentDescription = "White logo",
+                    modifier = Modifier.size(120.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
-
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -283,12 +293,12 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
                 Text(
                     "${currentWeek.expenses}",
                     style = TextStyle(
-                        fontSize = 35.sp,
+                        fontSize = 25.sp,
                         color = getExpenseColor(currentWeek.expenses, currentUser.weeklyPlan)
                     )
                 )
-                Text("/${currentUser.weeklyPlan}", style = TextStyle(fontSize = 35.sp))
-                Text(currentUser.currency, style = TextStyle(fontSize = 35.sp))
+                Text("/${currentUser.weeklyPlan}", style = TextStyle(fontSize = 25.sp))
+                Text(currentUser.currency, style = TextStyle(fontSize = 25.sp))
                 Spacer(modifier = Modifier.size(10.dp))
                 Button(onClick = {
                     viewModel.changeTab(CurrentHomeTab.EDIT_WEEKLY_PLAN)
@@ -311,7 +321,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         Column(
             modifier = Modifier.background(Color(0xFFE0E0E0))
                 .fillMaxSize()
-                .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
+                .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if((viewModel.currentExpenses?.expenses?.size ?: 0) == 0){
@@ -331,7 +341,8 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     @Composable
     fun SingleExpense(expense: Expense){
         Row(modifier = Modifier.padding(16.dp)) {
-            Text(expense.name, style = TextStyle(fontSize = 18.sp))
+
+            Text(TextFormatter.lazyColumnItemName(expense.name), style = TextStyle(fontSize = 18.sp))
             Spacer(Modifier.weight(1f))
             Text("${expense.amount} ${viewModel.currentUser?.currency}", style = TextStyle(fontSize = 18.sp))
             Spacer(Modifier.size(10.dp))
@@ -502,7 +513,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         BackHandler {
             onBackPressed()
         }
-        Text("Statistics")
+        Text("Under Development")
     }
 
 }
