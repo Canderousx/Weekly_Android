@@ -8,72 +8,34 @@ import com.Weekly.android.model.Request.UsernameExistsRequest
 import com.Weekly.android.model.Request.WeeklyPlanSetupReq
 import com.Weekly.android.model.User
 import com.Weekly.android.model.Response.UsernameExistsResponse
-import com.Weekly.android.service.LogService
 import com.Weekly.android.util.ApiConfiguration
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.contentType
 
 class UserDetailsApi(apiConfiguration: ApiConfiguration): BaseApi(apiConfiguration) {
 
     suspend fun getCurrentUser(): User?{
-        val response = httpClient.get(serverUrl+"getCurrentUser"){
-            contentType(contentType) }
-        if(response.status.value == 200){
-            val user:User = response.body()
-            return user
-        }
-        return null
+        return get("getCurrentUser",User::class.java)
     }
 
     suspend fun usernameExists(username:String): Boolean{
         val usernameExistsRequest = UsernameExistsRequest(username)
-        val response = httpClient.post(serverUrl+"username_exists"){
-            setBody(usernameExistsRequest)
-            contentType(contentType)
-        }
-        if(response.status.value == 200){
-            val usernameExists: UsernameExistsResponse = response.body()
-            return usernameExists.usernameExists
-        }
-        return false
+        val response = post("username_exists",UsernameExistsResponse::class.java,usernameExistsRequest) ?: return false
+        return response.usernameExists
     }
 
     suspend fun emailExists(email:String): Boolean{
         val emailExistsRequest = EmailExistsRequest(email)
-        val response = httpClient.post(serverUrl+"email_exists"){
-            setBody(emailExistsRequest)
-            contentType(contentType)
-        }
-        if(response.status.value == 200){
-            val emailExists: EmailExistsResponse = response.body()
-            return emailExists.emailExists
-        }
-        return false
+        val response = post("email_exists",EmailExistsResponse::class.java,emailExistsRequest) ?: return false
+        return response.emailExists
     }
 
     suspend fun signup(signupRequest: SignupRequest): ServerResponse{
-        val response = httpClient.post(serverUrl+"signup"){
-            setBody(signupRequest)
-            contentType(contentType)
-        }
-        val serverResponse: ServerResponse = response.body()
-        return serverResponse
+        val response = post("signup",ServerResponse::class.java,signupRequest) ?: ServerResponse("")
+        return response
     }
 
     suspend fun setWeeklyPlan(weeklyPlan: Double,currency: String,editMode:Boolean): ServerResponse?{
         val url = if(editMode) "editWeeklyPlan" else "setWeeklyPlan"
         val weeklyPlanRequest = WeeklyPlanSetupReq(weeklyPlan,currency)
-        val response =  httpClient.post(serverUrl+url){
-            setBody(weeklyPlanRequest)
-            contentType(contentType)
-        }
-        if(response.status.value == 200){
-            val serverResponse: ServerResponse = response.body()
-            return serverResponse
-        }
-        return null
+        return post(url,ServerResponse::class.java,weeklyPlanRequest)
     }
 }

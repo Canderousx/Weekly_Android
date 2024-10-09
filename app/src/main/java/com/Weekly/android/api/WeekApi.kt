@@ -5,82 +5,32 @@ import com.Weekly.android.model.ExpensesList
 import com.Weekly.android.model.Request.NewExpenseRequest
 import com.Weekly.android.model.Response.ServerResponse
 import com.Weekly.android.model.Week
-import com.Weekly.android.service.LogService
 import com.Weekly.android.util.ApiConfiguration
-import io.ktor.client.call.body
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.contentType
 
 class WeekApi(apiConfiguration: ApiConfiguration): BaseApi(apiConfiguration) {
 
     suspend fun getCurrentWeek(): Week?{
-        val response = httpClient.get(serverUrl+"getCurrentWeek"){
-            contentType(contentType)}
-        if(response.status.value == 200){
-            val week:Week = response.body()
-            return week
-        }
-        return null
+        return get("getCurrentWeek",Week::class.java)
     }
 
     suspend fun getAvailableCurrencies(): Currencies?{
-        val response = httpClient.get(serverUrl+"getCurrenciesNames"){
-            contentType(contentType)
-        }
-        if(response.status.value == 200){
-            val currencies: Currencies = response.body()
-            return currencies
-        }
-        return null
+        return get("getCurrenciesNames",Currencies::class.java)
     }
 
     suspend fun getWeekExpenses(weekId: String): ExpensesList?{
-        val response = httpClient.get(serverUrl+"getExpenses?id="+weekId+"&page_size=500&page=1"){
-            contentType(contentType)
-        }
-        if (response.status.value == 200){
-            val expenses: ExpensesList = response.body()
-            return expenses
-        }
-        return null
+        return get("getExpenses?id=${weekId}&page_size=500&page=1",ExpensesList::class.java)
     }
 
     suspend fun addNewExpense(newExpense: NewExpenseRequest):ServerResponse?{
-        val response = httpClient.post(serverUrl+"addExpense"){
-            contentType(contentType)
-            setBody(newExpense)
-        }
-        if(response.status.value == 200){
-            val serverResponse:ServerResponse = response.body()
-            return serverResponse
-        }
-        return null
+        return post("addExpense",ServerResponse::class.java,newExpense)
     }
 
     suspend fun editExpense(toEditId:String,newData: NewExpenseRequest):ServerResponse?{
-        val response = httpClient.post(serverUrl+"editExpense?id=${toEditId}"){
-            contentType(contentType)
-            setBody(newData)
-        }
-        if(response.status.value == 200){
-            val serverResponse:ServerResponse = response.body()
-            return serverResponse
-        }
-        return null
+        return post("editExpense?id=${toEditId}",ServerResponse::class.java,newData)
     }
 
     suspend fun deleteExpense(toDeleteId: String): ServerResponse?{
-        val response = httpClient.delete(serverUrl+"deleteExpense?id=${toDeleteId}"){
-            contentType(contentType)
-        }
-        if(response.status.value == 200){
-            val serverResponse: ServerResponse = response.body()
-            return serverResponse
-        }
-        return null
+        return delete("deleteExpense?id=${toDeleteId}",ServerResponse::class.java)
     }
 
 }
