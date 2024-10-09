@@ -52,7 +52,6 @@ class SignInActivity : BaseActivity<SignInViewModel>() {
 
     @Composable
     override fun OnSuccess() {
-        viewModel.logger.info("On success called!")
         Toast.makeText(this,"You've been logged in!",Toast.LENGTH_SHORT).show()
         val intent = Intent(this,HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
