@@ -1,6 +1,5 @@
 package com.Weekly.android.view
 
-import LoadingComposable
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -9,6 +8,7 @@ import androidx.compose.runtime.Composable
 import com.Weekly.android.model.ServerOperationStatus
 import com.Weekly.android.service.LogService
 import com.Weekly.android.service.ServerStatusHandler
+import com.Weekly.android.view.ui.theme.LoadingComposable
 import com.Weekly.android.viewModel.BaseViewModel
 
 abstract class BaseActivity<T: BaseViewModel>: ComponentActivity() {

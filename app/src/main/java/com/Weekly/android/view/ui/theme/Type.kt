@@ -5,6 +5,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.Weekly.android.service.FontService
+import com.Weekly.android.service.TextFormatter
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -31,4 +33,28 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+
+val MyTypography = Typography(
+    headlineLarge = TextStyle(
+        fontSize = 35.sp,
+        fontWeight = FontWeight.Bold
+    ),
+    headlineMedium = TextStyle(
+        fontSize = 25.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    headlineSmall = TextStyle(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Normal
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontService.montserrat,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.75.sp
+    ),
+
 )

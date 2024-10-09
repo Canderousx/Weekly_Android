@@ -1,6 +1,5 @@
 package com.Weekly.android.view
 
-import LoadingComposable
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import com.Weekly.android.model.Response.ServerResponse
 import com.Weekly.android.model.ServerOperationStatus
+import com.Weekly.android.view.ui.theme.LoadingComposable
 import com.Weekly.android.viewModel.EmailConfirmationModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

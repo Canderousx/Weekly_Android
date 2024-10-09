@@ -1,5 +1,4 @@
 package com.Weekly.android.view
-import MenuBar
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -58,6 +57,9 @@ import com.Weekly.android.model.User
 import com.Weekly.android.model.Week
 import com.Weekly.android.service.FontService
 import com.Weekly.android.service.TextFormatter
+import com.Weekly.android.view.ui.theme.MenuBar
+import com.Weekly.android.view.ui.theme.MyTypography
+import com.Weekly.android.view.ui.theme.WeeklyTheme
 import com.Weekly.android.viewModel.HomeViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -66,32 +68,36 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            if (viewModel.currentUser != null && viewModel.currentWeek != null) {
-                if(viewModel.currentUser!!.weeklyPlan == 0.0){
-                    WeeklyPlanSetup(false) { viewModel.returnToCurrentWeek() }
-                }else{
-                    MenuBar(viewModel.currentTab, changeTab = {tab -> viewModel.changeTab(tab)}){
-                        Background {
-                            when(viewModel.currentTab){
-                                CurrentHomeTab.CURRENT_WEEK -> HomeWindow()
-                                CurrentHomeTab.NEW_EXPENSE -> NewExpenseWindow { viewModel.returnToCurrentWeek() }
-                                CurrentHomeTab.STATISTICS -> StatisticsWindow { viewModel.returnToCurrentWeek() }
-                                CurrentHomeTab.EDIT_EXPENSE -> EditExpense { viewModel.returnToCurrentWeek() }
-                                CurrentHomeTab.CONFIRMATION_PANEL -> ConfirmationPanel(
-                                    onBackPressed = {viewModel.returnToCurrentWeek()},
-                                    onAgree = {viewModel.confirmationOnAgree()},
-                                    onDisagree = {viewModel.confirmationOnDisagree()},
-                                    text = viewModel.confirmationMessage
-                                )
+            WeeklyTheme {
+                if (viewModel.currentUser != null && viewModel.currentWeek != null) {
+                    if(viewModel.currentUser!!.weeklyPlan == 0.0){
+                        WeeklyPlanSetup(false) { viewModel.returnToCurrentWeek() }
+                    }else{
+                        MenuBar(viewModel.currentTab, changeTab = {tab -> viewModel.changeTab(tab)}){
+                            Background {
+                                when(viewModel.currentTab){
+                                    CurrentHomeTab.CURRENT_WEEK -> HomeWindow()
+                                    CurrentHomeTab.NEW_EXPENSE -> NewExpenseWindow { viewModel.returnToCurrentWeek() }
+                                    CurrentHomeTab.STATISTICS -> StatisticsWindow { viewModel.returnToCurrentWeek() }
+                                    CurrentHomeTab.EDIT_EXPENSE -> EditExpense { viewModel.returnToCurrentWeek() }
+                                    CurrentHomeTab.CONFIRMATION_PANEL -> ConfirmationPanel(
+                                        onBackPressed = {viewModel.returnToCurrentWeek()},
+                                        onAgree = {viewModel.confirmationOnAgree()},
+                                        onDisagree = {viewModel.confirmationOnDisagree()},
+                                        text = viewModel.confirmationMessage
+                                    )
 
-                                CurrentHomeTab.EDIT_WEEKLY_PLAN -> WeeklyPlanSetup(true){ viewModel.returnToCurrentWeek() }
+                                    CurrentHomeTab.EDIT_WEEKLY_PLAN -> WeeklyPlanSetup(true){ viewModel.returnToCurrentWeek() }
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
+                ObserveServerStatus()
+
             }
-            ObserveServerStatus()
+
         }
     }
 
@@ -161,10 +167,10 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
             var weeklyPlan by rememberSaveable { mutableStateOf( if(editMode) viewModel.currentUser?.weeklyPlan.toString() else "") }
             var selectedCurrency by rememberSaveable { mutableStateOf(if(editMode) viewModel.currentUser?.currency else viewModel.availableCurrencies?.names?.get(0) ?:"")}
             var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
-            Column(verticalArrangement = Arrangement.Center,
+            Column(Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally){
-                Text(if(editMode) "Edit your weekly expense goal" else "First, you need to specify your weekly expense goal!")
-                Spacer(Modifier.size(25.dp))
+                Text(if(editMode) "Edit your weekly expense goal" else "How much money you wish to spend every week?")
                 TextField(
                     value = weeklyPlan,
                     onValueChange = {weeklyPlan = it},
@@ -281,34 +287,32 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     @Composable
     fun CurrentWeek(currentUser: User,currentWeek: Week) {
         Column(
-            modifier = Modifier.background(Color(0xFFDCDCDC))
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Week", style = TextStyle(fontSize = 25.sp, fontFamily = FontService.montserrat))
+            Text("Week", style = MyTypography.headlineLarge)
             Text(
                 "${currentWeek.getStartDate()} - ${currentWeek.getEndDate()}",
-                style = TextStyle(fontSize = 25.sp)
+                style = MyTypography.headlineMedium
             )
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     "${currentWeek.expenses}",
-                    style = TextStyle(
-                        fontSize = 25.sp,
-                        color = getExpenseColor(currentWeek.expenses, currentUser.weeklyPlan)
-                    )
+                    style = MyTypography.headlineSmall.copy(color = getExpenseColor(currentWeek.expenses, currentUser.weeklyPlan))
                 )
-                Text("/${currentUser.weeklyPlan}", style = TextStyle(fontSize = 25.sp))
-                Text(currentUser.currency, style = TextStyle(fontSize = 25.sp))
+                Text("/${currentUser.weeklyPlan}", style = MyTypography.headlineSmall)
+                Text(currentUser.currency, style = MyTypography.headlineSmall)
                 Spacer(modifier = Modifier.size(10.dp))
                 Button(onClick = {
                     viewModel.changeTab(CurrentHomeTab.EDIT_WEEKLY_PLAN)
                 },
                     shape = CircleShape,
-                    modifier = Modifier.size(25.dp),
+                    modifier = Modifier.size(15.dp),
                     contentPadding = PaddingValues(1.dp)
                 ){
                     Icon(
@@ -346,9 +350,9 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     fun SingleExpense(expense: Expense){
         Row(modifier = Modifier.padding(16.dp)) {
 
-            Text(TextFormatter.lazyColumnItemName(expense.name), style = TextStyle(fontSize = 18.sp))
+            Text(TextFormatter.lazyColumnItemName(expense.name))
             Spacer(Modifier.weight(1f))
-            Text("${expense.amount} ${viewModel.currentUser?.currency}", style = TextStyle(fontSize = 18.sp))
+            Text("${expense.amount} ${viewModel.currentUser?.currency}")
             Spacer(Modifier.size(10.dp))
             Button(onClick = { viewModel.editExpense(expense) },
                 shape = CircleShape,
@@ -394,13 +398,12 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
             onBackPressed()
         }
         Column(
-            modifier = Modifier.background(Color(0xFFC9C9C9))
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 15.dp, end = 15.dp, top= 15.dp,bottom=15.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Expense Edit Window")
             NewExpenseForm(editMode = true)
         }
     }
@@ -426,7 +429,7 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         BackHandler {
             onBackPressed()
         }
-        Column(modifier = Modifier.background(Color(0xFFDCDCDC))
+        Column(modifier = Modifier
             .fillMaxSize()
             .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -446,6 +449,10 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally){
+
+            Text(
+                if (editMode) "Expense Edit Form" else "New Expense Form"
+            )
 
             TextField(
                 value = expenseName,

@@ -25,4 +25,6 @@ object FontService {
     }
 
     val montserrat = getFont("Montserrat")
+
+    val oswald = getFont("Oswald")
 }
