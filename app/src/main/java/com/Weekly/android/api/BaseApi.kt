@@ -9,7 +9,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.contentType
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 abstract class BaseApi(apiConfiguration: ApiConfiguration) {
 
