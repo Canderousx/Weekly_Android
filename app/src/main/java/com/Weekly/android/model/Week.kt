@@ -17,3 +17,8 @@ data class Week(val id:String,
         return weekEnd.date.toString()
     }
 }
+
+@Serializable
+data class WeeksList(
+    val weeks: List<Week>
+)

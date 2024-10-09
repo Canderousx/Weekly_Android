@@ -21,7 +21,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -520,15 +523,97 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
     }
 
     @Composable
+    fun SingleWeek(week: Week){
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(week.getStartDate()+"-"+week.getEndDate(), style = MyTypography.headlineSmall.copy(fontSize = 15.sp))
+            Spacer(Modifier.weight(1f))
+            Button(
+                onClick = {},
+
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "More",
+                    tint = Color.White
+                )
+            }
+        }
+    }
+
+    @Composable
     fun StatisticsWindow(onBackPressed: () -> Unit){
         BackHandler {
             onBackPressed()
         }
-        Text("Statistics", style = MyTypography.headlineLarge)
-        Spacer(Modifier.size(15.dp))
-        Row {
+
+        Column(
+            Modifier.fillMaxSize()
+        ) {
+            Text("Statistics", style = MyTypography.headlineLarge)
+            Spacer(Modifier.size(15.dp))
+            Row {
+                Text("Average Weekly Expense")
+                Spacer(Modifier.weight(1f))
+                Text(viewModel.averageWeeklyExpense.toString()+"/${viewModel.currentUser?.weeklyPlan}${viewModel.currentUser?.currency}")
+            }
+            Row {
+                Text("Average Expense")
+                Spacer(Modifier.weight(1f))
+                Text(viewModel.averageTotalExpense.toString()+viewModel.currentUser?.currency)
+
+            }
+            Row {
+                Text("Weeks in Weekly")
+                Spacer(Modifier.weight(1f))
+                Text(viewModel.howManyWeeks.toString())
+
+            }
+            Spacer(Modifier.size(10.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0A4900)
+                    )
+                ) {
+                    Text("Export to .xlsx")
+                }
+            }
+            Spacer(Modifier.size(10.dp))
+
+            Column(
+                modifier = Modifier.background(Color(0xFFE0E0E0))
+                    .fillMaxSize()
+                    .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 100.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    Modifier.fillMaxWidth()
+                        .padding(start = 30.dp, end = 15.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text("Week")
+                    Text("More")
+                }
+                LazyColumn {
+                    items(viewModel.allWeeks?.weeks?: emptyList()) { week ->
+                        Spacer(Modifier.size(20.dp))
+                        SingleWeek(week)
+                    }
+                }
+                Spacer(Modifier.size(25.dp))
+
+            }
+
+
 
         }
+
     }
 
 }

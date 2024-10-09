@@ -2,8 +2,11 @@ package com.Weekly.android.viewModel
 
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.Weekly.android.api.StatisticsApi
 import com.Weekly.android.api.UserDetailsApi
 import com.Weekly.android.api.WeekApi
 import com.Weekly.android.model.Currencies
@@ -17,6 +20,7 @@ import com.Weekly.android.model.ServerOperationStatus
 
 import com.Weekly.android.model.User
 import com.Weekly.android.model.Week
+import com.Weekly.android.model.WeeksList
 import com.Weekly.android.service.ValidatorService
 
 import com.Weekly.android.util.ApiConfiguration
@@ -29,6 +33,7 @@ class HomeViewModel(
 
     private val userDetailsApi = UserDetailsApi(apiConfiguration)
     private val weekApi = WeekApi(apiConfiguration)
+    private val statisticsApi = StatisticsApi(apiConfiguration)
     var currentTab by mutableStateOf<CurrentHomeTab>(CurrentHomeTab.CURRENT_WEEK)
 
     var currentUser by mutableStateOf<User?>(null)
@@ -39,6 +44,10 @@ class HomeViewModel(
     var confirmationMessage by mutableStateOf("")
     var confirmationOnAgree by mutableStateOf({})
     var confirmationOnDisagree by mutableStateOf({})
+    var averageWeeklyExpense by mutableDoubleStateOf(0.0)
+    var howManyWeeks by mutableIntStateOf(0)
+    var averageTotalExpense by mutableDoubleStateOf(0.0)
+    var allWeeks by mutableStateOf<WeeksList?>(null)
 
 
     init {
@@ -100,6 +109,43 @@ class HomeViewModel(
     }
 
     private fun getStatisticsData(){
+        serverConnection(
+            method = { statisticsApi.getAverageWeeklyExpense()},
+            onSuccess = { average ->
+                if (average != null) {
+                    averageWeeklyExpense = average
+                }
+            }
+        )
+
+        serverConnection(
+            method = { statisticsApi.getHowManyWeeksInWeekly()},
+            onSuccess = {
+                quantity ->
+                if(quantity != null){
+                    howManyWeeks = quantity
+                }
+            }
+        )
+
+        serverConnection(
+            method = { statisticsApi.getAverageTotalExpense()},
+            onSuccess = {
+                average ->
+                if(average != null){
+                    averageTotalExpense = average
+                }
+            }
+        )
+
+        serverConnection(
+            method = { statisticsApi.getWeeks() },
+            onSuccess = {
+                weeks -> allWeeks = weeks
+            }
+        )
+
+
 
     }
 
@@ -113,7 +159,14 @@ class HomeViewModel(
                     method = { currentWeek?.let { weekApi.getWeekExpenses(weekId = it.id) } },
                     onSuccess = {
                         expenses -> currentExpenses = expenses }
-                )},
+
+
+                )
+
+                getStatisticsData()
+
+
+                        },
         )
 
         getCurrencies()
