@@ -16,12 +16,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.contentType
 
-class UserDetailsApi(apiConfiguration: ApiConfiguration) {
-
-    private val httpClient = apiConfiguration.getClient()
-    private val serverUrl = apiConfiguration.getServerUrl()
-    private val contentType = apiConfiguration.getContentType()
-    private val logger = LogService()
+class UserDetailsApi(apiConfiguration: ApiConfiguration): BaseApi(apiConfiguration) {
 
     suspend fun getCurrentUser(): User?{
         val response = httpClient.get(serverUrl+"getCurrentUser"){

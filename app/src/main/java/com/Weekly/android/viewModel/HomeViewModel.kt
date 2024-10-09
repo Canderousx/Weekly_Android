@@ -99,6 +99,10 @@ class HomeViewModel(
         )
     }
 
+    private fun getStatisticsData(){
+
+    }
+
     private fun initData(){
         getCurrentUser()
         serverConnection(

@@ -14,12 +14,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.contentType
 
-class WeekApi(apiConfiguration: ApiConfiguration) {
-
-    private val httpClient = apiConfiguration.getClient()
-    private val serverUrl = apiConfiguration.getServerUrl()
-    private val contentType = apiConfiguration.getContentType()
-    private val logger = LogService()
+class WeekApi(apiConfiguration: ApiConfiguration): BaseApi(apiConfiguration) {
 
     suspend fun getCurrentWeek(): Week?{
         val response = httpClient.get(serverUrl+"getCurrentWeek"){

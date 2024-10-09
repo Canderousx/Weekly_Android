@@ -13,13 +13,7 @@ import io.ktor.http.contentType
 import io.ktor.http.HttpStatusCode
 
 
-class LoginApi(apiConfiguration: ApiConfiguration) {
-
-
-    private val httpClient = apiConfiguration.getClient()
-    private val serverUrl = apiConfiguration.getServerUrl()
-    private val contentType = apiConfiguration.getContentType()
-    private val logger = LogService()
+class LoginApi(apiConfiguration: ApiConfiguration): BaseApi(apiConfiguration) {
 
     suspend fun loginUser(loginRequest: LoginRequest):String{
         val response = httpClient.post(serverUrl + "login") {

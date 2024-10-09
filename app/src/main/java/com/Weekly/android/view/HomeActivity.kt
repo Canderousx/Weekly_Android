@@ -524,7 +524,11 @@ class HomeActivity : BaseActivity<HomeViewModel>() {
         BackHandler {
             onBackPressed()
         }
-        Text("Under Development")
+        Text("Statistics", style = MyTypography.headlineLarge)
+        Spacer(Modifier.size(15.dp))
+        Row {
+
+        }
     }
 
 }
